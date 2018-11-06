@@ -1,41 +1,15 @@
 pipeline {
-    agent none
+    agent {
+        docker {
+            image 'node:6-alpine' 
+            args '-p 3000:3000' 
+        }
+    }
     stages {
-        stage('Build') {
-            agent any
+        stage('Build') { 
             steps {
-                checkout scm
-                sh 'make'
-                stash includes: '**/target/*.jar', name: 'app' (1)
-            }
-        }
-        stage('Test on Linux') {
-            agent { (2)
-                label 'linux'
-            }
-            steps {
-                unstash 'app' (3)
-                sh 'make check'
-            }
-            post {
-                always {
-                    junit '**/target/*.xml'
-                }
-            }
-        }
-        stage('Test on Windows') {
-            agent {
-                label 'windows'
-            }
-            steps {
-                unstash 'app'
-                bat 'make check' (4)
-            }
-            post {
-                always {
-                    junit '**/target/*.xml'
-                }
+                sh 'npm install' 
             }
         }
     }
-}}  }
+}
